@@ -1,4 +1,4 @@
-# ParthanonsQWebSocketIO
+# Easy ParthanonsQWebSocketIO
 An implementation of QWebSocket that behaves similar to a SocketIO client without needing an additional library. It works well in QML.
 
 It will retry to connect if a connection fails. It buffers outbound messages for 5 connection attempts if it fails to send. (can be changed with retryLimit variable)
