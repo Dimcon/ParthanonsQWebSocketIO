@@ -1,5 +1,5 @@
-#ifndef CUSTOMWEBSOCKET_H
-#define CUSTOMWEBSOCKET_H
+#ifndef PARTHANONSQWEBSOCKET_H
+#define PARTHANONSQWEBSOCKET_H
 
 #include <QObject>
 #include <QQuickItem>
@@ -9,7 +9,7 @@
 
 // Created by Daimon Sewell - Daimonsewell@gmail.com
 
-class CustomWebSocket : public QObject
+class ParthanonsQWebSocket : public QObject
 {
     Q_OBJECT
 
@@ -18,15 +18,15 @@ class CustomWebSocket : public QObject
 public:
     explicit CustomWebSocket(QObject *parent = nullptr): QObject(parent) {
         qDebug() << "WebSocket client";
-        connect(&socket, &QWebSocket::connected, this, &CustomWebSocket::handleConnect);
-        connect(&socket, &QWebSocket::disconnected, this, &CustomWebSocket::handleDisconnect);
+        connect(&socket, &QWebSocket::connected, this, &ParthanonsQWebSocket::handleConnect);
+        connect(&socket, &QWebSocket::disconnected, this, &ParthanonsQWebSocket::handleDisconnect);
         connect(&socket, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error),
             [=](QAbstractSocket::SocketError error){
             qDebug() << "Connection died because: " << error;
             this->retryConnect(error);
         });
-        connect(&socket, &QWebSocket::textMessageReceived, this, &CustomWebSocket::handleMessageReceived);
-        connect(timer, &QTimer::timeout, this, &CustomWebSocket::updateSendQueue);
+        connect(&socket, &QWebSocket::textMessageReceived, this, &ParthanonsQWebSocket::handleMessageReceived);
+        connect(timer, &QTimer::timeout, this, &ParthanonsQWebSocket::updateSendQueue);
         timer->start(retryDelay);
     }
 
@@ -105,7 +105,6 @@ public slots:
     }
 
     void send(QString endpoint, QString data, QJSValue onComplete) {
-        // TODO: This doesn't take the endpoint into consideration. Needs to be adjusted.
         qDebug() << "CPP: [->]" << endpoint;
         if (bisConnected) {
             qint64 bytesSent = socket.sendTextMessage(endpoint + ";" + data);
@@ -117,18 +116,6 @@ public slots:
             outBoundOnCompleteFunctions.insert(key, onComplete);
             outBoundRetryCounters.insert(key, 0);
         }
-        // TODO: Needs tweaking
-
-            // UTF8 is the wrong format. This doesn't check how many bytes were sent properly
-//        qint64 bytes = data.toUtf8().size();
-//        if (bytesSent != bytes) didFail = true;
-
-//        if (onComplete.isCallable()) {
-//            QJSValueList args;
-//            args << QJSValue((didFail)? "Failed":"Success");
-//            isFailing = !didFail;
-//            onComplete.call(args);
-//        }
     }
 
     void updateSendQueue() {
@@ -193,4 +180,4 @@ private:
 
 };
 
-#endif // CUSTOMWEBSOCKET_H
+#endif // PARTHANONSQWEBSOCKET_H
