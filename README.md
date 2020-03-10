@@ -21,23 +21,41 @@ return app.exec();
 Use within QML main.qml:
 ```
 ParthanonsQWebSocket {
-        id: socket
-        Component.onCompleted: {
-            socket.on("RecieveTest", function(data) {
-                console.log("GOT DATA FROM SERVER: " + data)
-                let obj = JSON.parse(data);
-                console.log(obj)
+    id: socket
+    Component.onCompleted: {
+        socket.on("RecieveTest", function(data) {
+            console.log("GOT DATA FROM SERVER: " + data)
+            let obj = JSON.parse(data);
+            console.log(obj)
+        })
+        socket.connectTo("ws://demos.kaazing.com/echo")
+    }
+    onConnectionEstablished: {
+        // Do connection established stuff
+        statusIndicator.state = "Connected"
+    }
+    onDisconnect: {
+        // Do Connection died stuff
+        statusIndicator.state = "Disconnected"
+    }
+}
+
+Item {
+    MouseArea {
+        onClicked: {
+            data = {
+                mydata: "data", 
+                moredata: "moredata"
+            }
+            socket.send("ServerEndpoint", JSON.stringify(data), (result)=>{
+                if (result == "Failed"){
+                        console.log("Send timed out.")
+                } else {
+                        console.log("Message sent")
+                }
             })
-            socket.connectTo("ws://demos.kaazing.com/echo")
         }
-        onConnectionEstablished: {
-            // Do connection established stuff
-            statusIndicator.state = "Connected"
-        }
-        onDisconnect: {
-            // Do Connection died stuff
-            statusIndicator.state = "Disconnected"
-        }
+    }
 }
 ```
 
